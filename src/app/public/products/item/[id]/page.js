@@ -1,5 +1,6 @@
 'use client';
 
+import { toast } from 'react-toastify';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Image from 'next/image';
@@ -86,12 +87,47 @@ export default function ProductDetailPage({ params }) {
         }
       }
       fetchRelatedProducts();
+      fetchCartItems();
     }
   }, [product]);
+  const fetchCartItems = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        '/api/client/show-cart',
+        { accessToken: token }, // Request body with the accessToken
+        { headers: { Authorization: `Bearer ${token}` } } // Optional headers if needed
+      );
+      if (response.status === 200) {
+        console.log(response.data.data);
+        setCartData(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching cart items:', error);
+      toast.error('Failed to fetch cart items: ' + error.message);
+    }
+  };
 
-  const handleAddToCart = () => {
-    setCartData([...cartDataState, product]);
-    setIsDrawerOpen(true);
+  // useEffect(() => {
+  //   fetchCartItems();
+  // }, [cartDataState]);
+  const handleAddToCart = async () => {
+    try {
+      const response = await axios.post('/api/client/add-cart', {
+        accessToken: localStorage.getItem('token'),
+        menuItemId: params.id,
+        quantity: 1,
+      });
+      if (response.status === 201) {
+        toast.success('Item added to cart');
+        setCartData([...cartDataState, product]);
+        setIsDrawerOpen(true);
+      } else {
+        toast.error('Add to cart failed: ' + response.data.error);
+      }
+    } catch (error) {
+      toast.error('Add to cart failed: ' + error.message);
+    }
   };
 
   if (loading) return <p>Loading...</p>;
@@ -224,9 +260,6 @@ export default function ProductDetailPage({ params }) {
               >
                 <ShoppingCart className='h-4 w-4' />
                 Add to Cart
-              </Button>
-              <Button variant='secondary' className='flex-1'>
-                Buy Now
               </Button>
             </div>
 

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import DB from '../../../lib/dbconnect'; 
+import DB from '@/lib/db';
 import sendEmail from '@/helpers/mailer';
-import User from '@/moduls/client';
+import User from '@/models/user.model';
 
 DB();
 
@@ -13,7 +13,10 @@ export async function POST(request) {
     // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
-      return NextResponse.json({ error: "User not registered" }, { status: 404 });
+      return NextResponse.json(
+        { error: 'User not registered' },
+        { status: 404 }
+      );
     }
 
     // Generate OTP (6 digits)
@@ -33,11 +36,17 @@ export async function POST(request) {
       <p>It will expire in 5 minutes.</p>
       <p>If you didn't request this, please ignore this email.</p>
     `;
-    await sendEmail({ useremail:email, subject, text, html });
+    await sendEmail({ useremail: email, subject, text, html });
 
-    return NextResponse.json({ message: 'OTP sent successfully!' }, { status: 200 });
+    return NextResponse.json(
+      { message: 'OTP sent successfully!' },
+      { status: 200 }
+    );
   } catch (error) {
     console.error('Error in /api/client/sendotp:', error);
-    return NextResponse.json({ error: "An error occurred while generating OTP" }, { status: 500 });
+    return NextResponse.json(
+      { error: 'An error occurred while generating OTP' },
+      { status: 500 }
+    );
   }
 }

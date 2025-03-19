@@ -29,8 +29,6 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-// No password hashing middleware, password will be saved as plain text
-
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 export default User;

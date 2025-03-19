@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import bcryptjs from 'bcryptjs';
-import User from '@/moduls/client';
-import DB from '../../../lib/dbconnect';
 import sendEmail from '@/helpers/mailer';
+import User from '@/models/user.model';
+import DB from '@/lib/db';
 
 DB();
 

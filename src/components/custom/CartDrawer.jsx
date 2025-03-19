@@ -1,5 +1,6 @@
 'use client';
 import Image from 'next/image';
+import axios from 'axios';
 import {
   Drawer,
   DrawerClose,
@@ -28,8 +29,26 @@ export default function CartDrawer({
     e.stopPropagation();
     setIsOpen(false);
   };
-  const updateCartUI = () => {
-    setCartItems([...cartItems]);
+
+  // Call the API to remove a cart item and update the local state
+  const removeCartItem = async (productId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        '/api/client/remove-cart',
+        { accessToken: token, productId },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+      if (response.status === 200) {
+        console.log(response.data.message);
+        // Remove the item from local state using the product _id
+        const updatedCart = cartItems.filter((item) => item._id !== productId);
+        setCartItems(updatedCart);
+      }
+    } catch (error) {
+      console.error('Error removing cart item:', error);
+      // Optionally, display an error to the user
+    }
   };
 
   const totalAmount = cartItems
@@ -61,30 +80,22 @@ export default function CartDrawer({
           {/* Cart Items */}
           <div className='border-[1px] border-[#0000001A] rounded-[20px] px-4 text-white mt-4 flex-1 overflow-y-auto'>
             {cartItems.map((cartItem) => (
-              <div key={cartItem.id} className='mt-2'>
+              <div key={cartItem._id} className='mt-2'>
                 <div className='flex items-center'>
-                  {/* <Image
+                  {/* Uncomment and adjust if you have a valid image source
+                  <Image
                     width={80}
                     height={80}
                     src={cartItem.src}
                     alt={cartItem.title}
                   /> */}
                   <div className='flex flex-col ml-[10px]'>
-                    <p className=' text-[20px] font-bold'>{cartItem.name}</p>
-                    <p className=' text-[24px] font-bold'>${cartItem.price}</p>
+                    <p className='text-[20px] font-bold'>{cartItem.name}</p>
+                    <p className='text-[24px] font-bold'>${cartItem.price}</p>
                   </div>
                   <button
                     className='ml-auto'
-                    onClick={() => {
-                      const productIndex = cartItems.findIndex(
-                        (product) => product.id === cartItem.id
-                      );
-
-                      if (productIndex !== -1) {
-                        cartItems.splice(productIndex, 1);
-                        updateCartUI();
-                      }
-                    }}
+                    onClick={() => removeCartItem(cartItem._id)}
                   >
                     <X />
                   </button>
@@ -98,8 +109,8 @@ export default function CartDrawer({
           <div className='mt-auto'>
             <div className='fixed bottom-0 w-full'>
               <div className='border-t-[2px] border-[#0000001A] h-[50px] flex flex-row items-center mr-4 ml-4'>
-                <h1 className=' font-semibold text-[31px]'>Total</h1>
-                <h1 className='ml-auto  font-bold text-[33px]'>
+                <h1 className='font-semibold text-[31px]'>Total</h1>
+                <h1 className='ml-auto font-bold text-[33px]'>
                   ${totalAmount}
                 </h1>
               </div>

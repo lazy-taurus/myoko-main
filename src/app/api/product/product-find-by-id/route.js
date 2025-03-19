@@ -18,7 +18,7 @@ export async function POST(request) {
     }
 
     // Fetch product based on ID
-    const product = await Product.findOne({ _id: slug });
+    let product = await Product.findOne({ _id: slug });
 
     // Handle case where no product is found
     if (!product) {
@@ -28,7 +28,9 @@ export async function POST(request) {
     // Convert Buffer image to Base64 if image exists
     const updatedProduct = product.toObject();
     if (product.image && product.image.data) {
-      updatedProduct.image = `data:${product.image.contentType};base64,${product.image.data.toString('base64')}`;
+      updatedProduct.image = `data:${
+        product.image.contentType
+      };base64,${product.image.data.toString('base64')}`;
     }
 
     console.log(updatedProduct);

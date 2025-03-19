@@ -1,3 +1,4 @@
+'use client';
 import React, { useState } from 'react';
 import axios from 'axios';
 
@@ -70,89 +71,91 @@ const AddProductDialog = ({ isOpen, onClose, artisanId }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
-        <h2 className="text-xl font-semibold mb-4">Add New Product</h2>
-        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+    <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50'>
+      <div className='bg-white rounded-lg shadow-lg w-full max-w-md p-6'>
+        <h2 className='text-xl font-semibold mb-4'>Add New Product</h2>
+        {error && <p className='text-red-500 text-sm mb-4'>{error}</p>}
         <form onSubmit={handleSubmit}>
           {/* Product Name */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Name</label>
+          <div className='mb-4'>
+            <label className='block text-sm font-medium mb-1'>Name</label>
             <input
-              type="text"
-              name="name"
+              type='text'
+              name='name'
               value={productData.name}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded"
+              className='w-full p-2 border rounded'
               required
             />
           </div>
 
           {/* Product Description */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Description</label>
+          <div className='mb-4'>
+            <label className='block text-sm font-medium mb-1'>
+              Description
+            </label>
             <textarea
-              name="description"
+              name='description'
               value={productData.description}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded"
+              className='w-full p-2 border rounded'
               required
             />
           </div>
 
           {/* Product Price */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Price</label>
+          <div className='mb-4'>
+            <label className='block text-sm font-medium mb-1'>Price</label>
             <input
-              type="number"
-              name="price"
+              type='number'
+              name='price'
               value={productData.price}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded"
+              className='w-full p-2 border rounded'
               required
             />
           </div>
 
           {/* Product Category */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Category</label>
+          <div className='mb-4'>
+            <label className='block text-sm font-medium mb-1'>Category</label>
             <select
-              name="category"
+              name='category'
               value={productData.category}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded"
+              className='w-full p-2 border rounded'
               required
             >
-              <option value="jewelry">Jewelry</option>
-              <option value="clothing">Clothing</option>
-              <option value="home-decor">Home Decor</option>
-              <option value="art">Art</option>
-              <option value="accessories">Accessories</option>
-              <option value="other">Other</option>
+              <option value='jewelry'>Jewelry</option>
+              <option value='clothing'>Clothing</option>
+              <option value='home-decor'>Home Decor</option>
+              <option value='art'>Art</option>
+              <option value='accessories'>Accessories</option>
+              <option value='other'>Other</option>
             </select>
           </div>
 
           {/* Product Images */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Images</label>
+          <div className='mb-4'>
+            <label className='block text-sm font-medium mb-1'>Images</label>
             <input
-              type="file"
-              name="images"
+              type='file'
+              name='images'
               onChange={handleImageUpload}
-              className="w-full p-2 border rounded"
+              className='w-full p-2 border rounded'
               multiple
-              accept="image/*"
+              accept='image/*'
             />
           </div>
 
           {/* In Stock */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">In Stock</label>
+          <div className='mb-4'>
+            <label className='block text-sm font-medium mb-1'>In Stock</label>
             <select
-              name="inStock"
+              name='inStock'
               value={productData.inStock}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded"
+              className='w-full p-2 border rounded'
               required
             >
               <option value={true}>Yes</option>
@@ -161,18 +164,18 @@ const AddProductDialog = ({ isOpen, onClose, artisanId }) => {
           </div>
 
           {/* Buttons */}
-          <div className="flex justify-end gap-2">
+          <div className='flex justify-end gap-2'>
             <button
-              type="button"
+              type='button'
               onClick={onClose}
-              className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+              className='px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600'
             >
               Cancel
             </button>
             <button
-              type="submit"
+              type='submit'
               disabled={loading}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300"
+              className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300'
             >
               {loading ? 'Adding...' : 'Add Product'}
             </button>
