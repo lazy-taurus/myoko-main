@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -36,18 +36,10 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import Script from 'next/script';
 import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 
 // Sample cart items
-const cartItems = [
-  {
-    id: 'p1',
-    name: 'Golden Muga Silk Mekhela Chador with Traditional Motifs',
-    price: 15000,
-    quantity: 2,
-    image: '/img/goldenmuga.jpg',
-    artisan: 'Lakshmi Devi',
-  },
-];
 
 export default function CheckoutPage({ cartId }) {
   const [activeStep, setActiveStep] = useState('shipping');
@@ -67,6 +59,39 @@ export default function CheckoutPage({ cartId }) {
   });
   const [errors, setErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
+  const [cartData, setCartData] = useState([]);
+  const [subtotal, setSubTotal] = useState(0);
+
+  const fetchCartItems = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        '/api/client/show-cart',
+        { accessToken: token },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (response.status === 200) {
+        console.log(response.data.data);
+        const data = response.data.data;
+        setCartData(data);
+
+        // Calculate subtotal from the fetched data directly
+        const tot = data.reduce(
+          (total, item) => total + item.menuItemId.price * item.quantity,
+          0
+        );
+        setSubTotal(tot);
+      }
+    } catch (error) {
+      console.error('Error fetching cart items:', error);
+      toast.error('Failed to fetch cart items: ' + error.message);
+    }
+  };
+
+  // Call fetchCartItems on component mount
+  useEffect(() => {
+    fetchCartItems();
+  }, []);
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
@@ -165,10 +190,8 @@ export default function CheckoutPage({ cartId }) {
   };
 
   // Calculate order summary
-  const subtotal = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
+  // console.log(cartData);
+
   const shipping = 250;
   const tax = Math.round(subtotal * 0.18); // 18% GST
   const total = subtotal + shipping + tax;
@@ -176,13 +199,6 @@ export default function CheckoutPage({ cartId }) {
   return (
     <div className='container mx-auto px-4 py-8'>
       <Script src='https://checkout.razorpay.com/v1/checkout.js' />
-      <Link
-        href='/cart'
-        className='inline-flex items-center text-muted-foreground hover:text-foreground mb-6'
-      >
-        <ChevronLeft className='h-4 w-4 mr-1' />
-        Back to Cart
-      </Link>
 
       <h1 className='text-3xl font-bold mb-8'>Checkout</h1>
 
@@ -193,27 +209,31 @@ export default function CheckoutPage({ cartId }) {
             <h2 className='text-xl font-semibold mb-4'>Order Summary</h2>
 
             <div className='space-y-4 mb-6'>
-              {cartItems.map((item) => (
-                <div key={item.id} className='flex gap-4'>
+              {cartData.map((item) => (
+                <div key={item._id} className='flex gap-4'>
                   <div className='relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border'>
                     <Image
-                      src={item.image || '/placeholder.svg'}
-                      alt={item.name}
+                      src={
+                        item.menuItemId.images[0]
+                          ? `data:image/jpeg;base64,${item.menuItemId.images[0]}`
+                          : '/placeholder.svg'
+                      }
+                      alt={item.menuItemId.name}
                       fill
                       className='object-cover'
                     />
                   </div>
                   <div className='flex-1'>
                     <h3 className='text-sm font-medium line-clamp-2'>
-                      {item.name}
+                      {item.menuItemId.name}
                     </h3>
                     <p className='text-xs text-muted-foreground'>
-                      By {item.artisan}
+                      By {item.menuItemId.artisan}
                     </p>
                     <div className='flex justify-between mt-1'>
                       <p className='text-sm'>Qty: {item.quantity}</p>
                       <p className='text-sm font-medium'>
-                        ₹{item.price.toLocaleString()}
+                        ₹{item.menuItemId.price.toLocaleString()}
                       </p>
                     </div>
                   </div>

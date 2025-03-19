@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import User from '@/models/user.model';
 import cartModel from '@/models/cart.model';
+import Product from '@/models/product.model';
 
 DB();
 
